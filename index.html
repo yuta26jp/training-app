@@ -1,47 +1,45 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>筋トレ</title>
-  <!-- iPhoneの「ホーム画面に追加」で使われるアイコンと名前 -->
-  <link rel="apple-touch-icon" href="https://yuta26jp.github.io/training-app/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="https://yuta26jp.github.io/training-app/icon-192.png">
-  <meta name="apple-mobile-web-app-title" content="筋トレ">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="robots" content="noindex">
-  <style>
-    :root { --bg: #ffffff; --fg: #37352f; --muted: #787774; }
-    @media (prefers-color-scheme: dark) { :root { --bg: #191919; --fg: #e3e3e1; --muted: #9b9b9b; } }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
-      font-family: ui-sans-serif, -apple-system, "Hiragino Sans", sans-serif; }
-    .box { text-align: center; padding: 16px; }
-    img { width: 72px; height: 72px; border-radius: 16px; }
-    p { color: var(--muted); font-size: 14px; }
-    a { color: var(--fg); }
-  </style>
+<meta charset="utf-8">
+<title>筋トレ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="筋トレ">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex">
+<link rel="apple-touch-icon" href="https://yuta26jp.github.io/training-app/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://yuta26jp.github.io/training-app/icon-192.png">
+<style>
+  /* 筋トレアプリの入口（経費精算アプリの entrance と同じ作り）。アプリをこのページの中に読み込むので、
+     ホーム画面のアイコンから開いたとき、下に Safari のボタンが出ずに全画面で使える。
+     アプリのデータは PIN のログインで守っている（アプリ側の auth.js） */
+  :root { --bg: #ffffff; --muted: #787774; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #191919; --muted: #9b9b9b; } }
+  html, body { margin: 0; height: 100%; background: var(--bg); }
+  body { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); display: flex; flex-direction: column; }
+  iframe { flex: 1; width: 100%; border: 0; background: var(--bg); display: block; }
+  .splash { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; background: var(--bg); color: var(--muted); font: 14px -apple-system, "Hiragino Sans", sans-serif; transition: opacity .3s; }
+  .splash img { width: 96px; height: 96px; border-radius: 22px; }
+  .splash.hide { opacity: 0; pointer-events: none; }
+</style>
 </head>
 <body>
-  <div class="box">
-    <img src="https://yuta26jp.github.io/training-app/apple-touch-icon.png" alt="">
-    <p id="msg">筋トレアプリを開いています…</p>
-    <p><a id="go" href="#">筋トレアプリを開く</a></p>
-    <p id="how" hidden>ホーム画面に置くには：共有ボタン →「ホーム画面に追加」</p>
-  </div>
-  <script>
-    // 入口ページ：アイコンを出すためだけのページ。開いたらすぐGASの本番アプリへ移る
-    var APP_URL = 'https://script.google.com/macros/s/AKfycbwe2tn7QAqEK4jewPdzgUhTQpF2RadL7meeNnHLTwWZ3m-kWHE_Oby-iPyBKeN0Krer/exec?env=prod';
-    document.getElementById('go').href = APP_URL;
-    // ホーム画面のアイコンから開いたとき（standalone）だけ、すぐアプリへ移る。
-    // Safariで開いたときは移らずに「ホーム画面に追加」の案内を出す（追加する前に移ってしまわないように）
-    if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-      location.replace(APP_URL);
-    } else {
-      document.getElementById('msg').textContent = '筋トレアプリの入口です';
-      document.getElementById('how').hidden = false;
-    }
-  </script>
+<iframe id="app" title="筋トレ" allow="screen-wake-lock; clipboard-write; autoplay"></iframe>
+<div class="splash" id="splash">
+  <img src="https://yuta26jp.github.io/training-app/apple-touch-icon.png" alt="">
+  <div>読み込み中…</div>
+</div>
+<script>
+  // 筋トレアプリ（Apps Script の Webアプリ・本番）
+  const APP_URL = 'https://script.google.com/macros/s/AKfycbwe2tn7QAqEK4jewPdzgUhTQpF2RadL7meeNnHLTwWZ3m-kWHE_Oby-iPyBKeN0Krer/exec?env=prod';
+  const app = document.getElementById('app'), splash = document.getElementById('splash');
+  app.addEventListener('load', () => splash.classList.add('hide'));
+  app.src = APP_URL;
+  setTimeout(() => splash.classList.add('hide'), 8000); // 読み込みに時間がかかっても8秒で画面を出す
+</script>
 </body>
 </html>
